@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        video {
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sign Up</h1>
+    <p>Click the button below to capture your face image:</p>
+    
+    <video id="webcam" autoplay></video>
+    <button id="captureButton">Capture Image</button>
+
+    <form id="signupForm" method="POST">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <input type="hidden" id="imageData" name="imageData" required>
+        <br>
+        <input type="submit" value="Sign Up">
+    </form>
+
+    <script>
+        // Access the webcam and set up the video element
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                const video = document.getElementById('webcam');
+                video.srcObject = stream;
+            })
+            .catch(error => console.error('Error accessing webcam:', error));
+
+        // Capture image from webcam
+        const captureButton = document.getElementById('captureButton');
+        const signupForm = document.getElementById('signupForm');
+        const imageDataInput = document.getElementById('imageData');
+
+        captureButton.addEventListener('click', () => {
+            const video = document.getElementById('webcam');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convert the captured image to base64 data URL
+            const imageData = canvas.toDataURL('image/jpeg');
+
+            // Set the base64 image data to the hidden input field
+            imageDataInput.value = imageData;
+
+            // Optional: Display the captured image
+            const imagePreview = document.createElement('img');
+            imagePreview.src = imageData;
+            document.body.appendChild(imagePreview);
+        });
+
+        // Submit the form with the captured image data
+        signupForm.addEventListener('submit', (event) => {
+            // Prevent the default form submission
+            event.preventDefault();
+
+            // Submit the form via AJAX or other methods as needed
+            // You can access the captured image data using: imageDataInput.value
+            // For now, we'll just submit the form to the server
+            signupForm.submit();
+        });
+    </script>
+</body>
+</html>
+
